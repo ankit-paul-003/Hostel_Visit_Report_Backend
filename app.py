@@ -30,11 +30,22 @@ UPLOAD_FOLDER_ID = os.getenv("UPLOAD_FOLDER_ID", "1-bPtMwp6rPE3D2yqmk5qnq8Ytvl_O
 ga_json = os.getenv("GOOGLE_DRIVE_CREDENTIALS_JSON")
 if ga_json:
     import json
-    try:
-        info = json.loads(ga_json)
-        creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
-    except Exception as e:
-        raise RuntimeError("Failed to parse GOOGLE_DRIVE_CREDENTIALS_JSON: {}".format(e))
+    ga_json_str = ga_json.strip()
+    # If the env var contains JSON text, parse it. If it contains a filename
+    # (e.g. for local testing someone set the filename into the var), load
+    # from that file. Otherwise raise a helpful error.
+    if ga_json_str.startswith("{"):
+        try:
+            info = json.loads(ga_json_str)
+            creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+        except Exception as e:
+            raise RuntimeError("Failed to parse GOOGLE_DRIVE_CREDENTIALS_JSON: {}".format(e))
+    elif os.path.isfile(ga_json_str):
+        creds = service_account.Credentials.from_service_account_file(ga_json_str, scopes=SCOPES)
+    else:
+        raise RuntimeError(
+            "GOOGLE_DRIVE_CREDENTIALS_JSON is set but is not valid JSON nor a path to a file: '{}'".format(ga_json_str)
+        )
 else:
     # Fall back to loading from a file path (useful for local development only)
     creds_path = SERVICE_ACCOUNT_FILE
