@@ -3,7 +3,7 @@
 Flask==3.0.0
 Flask-Cors==4.0.0
 python-dotenv==1.0.0
-psycopg2-binary==2.9.9
+psycopg2-binary==2.9.11
 numpy==1.24.3
 pandas==2.0.3
 google-auth==2.23.3
