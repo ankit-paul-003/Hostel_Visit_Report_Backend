@@ -1,9 +1,13 @@
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 import datetime
 
 import jwt
 
 # Use an env var in production
-SECRET_KEY = "your_secret_key_here_change_in_prod"
+SECRET_KEY = os.getenv('FLASK_SECRET_KEY')
 
 def generate_token(user_type, username, hours_valid=3):
     payload = {

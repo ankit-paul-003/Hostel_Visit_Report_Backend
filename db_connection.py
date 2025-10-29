@@ -1,8 +1,12 @@
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
 import os
 
 from psycopg2.pool import SimpleConnectionPool
 
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:ankit123@localhost:5432/hostel_report")
+DATABASE_URL = os.getenv("DATABASE_URL", "os.getenv('DATABASE_URL')")
 
 # Create pool sizes as needed
 db_pool = SimpleConnectionPool(1, 10, DATABASE_URL)

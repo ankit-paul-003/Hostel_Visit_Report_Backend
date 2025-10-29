@@ -1,3 +1,9 @@
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import datetime
 import os
 from io import BytesIO
@@ -27,7 +33,7 @@ drive_service = build('drive', 'v3', credentials=creds)
 # ------------------------------ #
 app = Flask(__name__)
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}})
-SECRET_KEY = "your_secret_key_here"  # Use a strong key in production
+SECRET_KEY = os.getenv('FLASK_SECRET_KEY')  # Use a strong key in production
 
 # ------------------------------ #
 # Database Connection            #
