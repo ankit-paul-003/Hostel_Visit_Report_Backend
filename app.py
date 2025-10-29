@@ -24,7 +24,22 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_CREDENTIALS", "hostelmanagement-455018-5e40c6a6113c.json")
 UPLOAD_FOLDER_ID = os.getenv("UPLOAD_FOLDER_ID", "1-bPtMwp6rPE3D2yqmk5qnq8Ytvl_O07A")
 
-creds = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+# Support loading Google service account credentials from an environment variable
+# (recommended for hosted environments like Render). If `GOOGLE_DRIVE_CREDENTIALS_JSON`
+# is set, it should contain the full JSON contents of the service account file.
+ga_json = os.getenv("GOOGLE_DRIVE_CREDENTIALS_JSON")
+if ga_json:
+    import json
+    try:
+        info = json.loads(ga_json)
+        creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+    except Exception as e:
+        raise RuntimeError("Failed to parse GOOGLE_DRIVE_CREDENTIALS_JSON: {}".format(e))
+else:
+    # Fall back to loading from a file path (useful for local development only)
+    creds_path = SERVICE_ACCOUNT_FILE
+    creds = service_account.Credentials.from_service_account_file(creds_path, scopes=SCOPES)
+
 drive_service = build('drive', 'v3', credentials=creds)
 
 # ------------------------------ #
