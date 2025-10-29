@@ -2,7 +2,7 @@ services:
   - type: web
     name: hostel-visit-backend
     env: python
-    runtime: python3
+    runtime: python311
     buildCommand: |
       python -m pip install --upgrade pip
       pip install --upgrade setuptools wheel
@@ -13,4 +13,6 @@ services:
         value: 3.11.7
       - key: PIP_ONLY_BINARY
         value: ":all:"
+      - key: PYTHONUNBUFFERED
+        value: "true"
     autoDeploy: true
