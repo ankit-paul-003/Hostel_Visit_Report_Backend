@@ -32,20 +32,25 @@ if ga_json:
     import json
     ga_json_str = ga_json.strip()
     # If the env var contains JSON text, parse it. If it contains a filename
-    # (e.g. for local testing someone set the filename into the var), load
-    # from that file. Otherwise raise a helpful error.
-    if ga_json_str.startswith("{"):
+    # (for example someone placed the filename, possibly wrapped in braces
+    # like "{hostelmanagement-...json}"), load from that file. Otherwise
+    # raise a helpful error.
+    if ga_json_str.startswith("{") and '"' in ga_json_str:
+        # Likely actual JSON (contains double quotes)
         try:
             info = json.loads(ga_json_str)
             creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
         except Exception as e:
             raise RuntimeError("Failed to parse GOOGLE_DRIVE_CREDENTIALS_JSON: {}".format(e))
-    elif os.path.isfile(ga_json_str):
-        creds = service_account.Credentials.from_service_account_file(ga_json_str, scopes=SCOPES)
     else:
-        raise RuntimeError(
-            "GOOGLE_DRIVE_CREDENTIALS_JSON is set but is not valid JSON nor a path to a file: '{}'".format(ga_json_str)
-        )
+        # Treat value as a filename (strip surrounding braces or quotes if present)
+        candidate = ga_json_str.strip().strip('{}').strip('"').strip("'")
+        if os.path.isfile(candidate):
+            creds = service_account.Credentials.from_service_account_file(candidate, scopes=SCOPES)
+        else:
+            raise RuntimeError(
+                "GOOGLE_DRIVE_CREDENTIALS_JSON is set but is not valid JSON nor a path to a file: '{}'".format(ga_json_str)
+            )
 else:
     # Fall back to loading from a file path (useful for local development only)
     creds_path = SERVICE_ACCOUNT_FILE
@@ -439,4 +444,7 @@ def download_report(period):
 # Run Server                     #
 # ------------------------------ #
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Get port from environment variable for Render deployment
+    port = int(os.getenv("PORT", 8000))
+    # Run with host '0.0.0.0' to accept external connections
+    app.run(host='0.0.0.0', port=port, debug=False)
