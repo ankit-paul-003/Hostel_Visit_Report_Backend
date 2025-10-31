@@ -62,7 +62,8 @@ drive_service = build('drive', 'v3', credentials=creds)
 # Flask Setup                    #
 # ------------------------------ #
 app = Flask(__name__)
-CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173"}})
+# Configure CORS to allow requests from your frontend domains
+CORS(app, supports_credentials=True)
 SECRET_KEY = os.getenv('FLASK_SECRET_KEY')  # Use a strong key in production
 
 # ------------------------------ #
