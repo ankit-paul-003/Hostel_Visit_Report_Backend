@@ -56,7 +56,11 @@ else:
     creds_path = SERVICE_ACCOUNT_FILE
     creds = service_account.Credentials.from_service_account_file(creds_path, scopes=SCOPES)
 
-drive_service = build('drive', 'v3', credentials=creds)
+try:
+    drive_service = build('drive', 'v3', credentials=creds)
+except Exception as e:
+    print(f"WARNING: Failed to initialize Google Drive service: {e}")
+    drive_service = None
 
 # ------------------------------ #
 # Flask Setup                    #
@@ -153,8 +157,9 @@ def admin_login():
         cur.close()
         conn.close()
 
+        # Special Admin
         if user:
-            user_type = "Paul" if admin_id == "Paul" and password == "1234" else "admin"
+            user_type = "Paul" if admin_id == "Paul" and password == "1234" else "admin" 
             token = generate_token(user_type, admin_id)
             return jsonify({"success": True, "message": "Login successful", "token": token})
 
@@ -218,6 +223,8 @@ def submit_form():
     if 'image' in request.files:
         image_file = request.files['image']
         if image_file:
+            if not drive_service:
+                return jsonify({"success": False, "message": "Image upload failed: Google Drive service not initialized"}), 500
             try:
                 file_metadata = {'name': image_file.filename, 'parents': [UPLOAD_FOLDER_ID]}
                 media = MediaIoBaseUpload(image_file, mimetype=image_file.mimetype, resumable=True)
