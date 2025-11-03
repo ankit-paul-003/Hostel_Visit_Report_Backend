@@ -77,13 +77,17 @@ SECRET_KEY = os.getenv('FLASK_SECRET_KEY')  # Use a strong key in production
 # Database Connection            #
 # ------------------------------ #
 def get_db_connection():
-    return psycopg2.connect(
-        database="hostel_report",
-        user="postgres",
-        password="ankit123",
-        host="localhost",
-        port="5432"
-    )
+    conn_str = os.getenv("DATABASE_URL")
+    if not conn_str:
+        # Fallback for local development if DATABASE_URL is not set
+        return psycopg2.connect(
+            database="hostel_report",
+            user="postgres",
+            password="ankit123",
+            host="localhost",
+            port="5432"
+        )
+    return psycopg2.connect(conn_str)
 
 # ------------------------------ #
 # JWT Token                      #
