@@ -66,7 +66,8 @@ app = Flask(__name__)
 # Define allowed origins
 origins = [
     "http://localhost:5173",
-    "https://hostel-visit-report-frontend-git-main-ankits-projects-1ee6b2b9.vercel.app"
+    "https://hostel-visit-report-frontend-git-main-ankits-projects-1ee6b2b9.vercel.app",
+    "https://hostel-visit-report-frontend.vercel.app"
 ]
 
 CORS(app, supports_credentials=True, origins=origins)
