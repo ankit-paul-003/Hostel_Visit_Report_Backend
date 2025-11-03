@@ -117,7 +117,7 @@ def verify_token(token):
 # ------------------------------ #
 # Teacher Login                  #
 # ------------------------------ #
-@app.route('/teacher-login', methods=['POST'])
+@app.route('/teacher-login', methods=['POST', 'OPTIONS'])
 def teacher_login():
     data = request.json
     teacher_id = data.get("teacherId")
@@ -147,7 +147,7 @@ def teacher_login():
 # ------------------------------ #
 # Admin Login                    #
 # ------------------------------ #
-@app.route('/admin-login', methods=['POST'])
+@app.route('/admin-login', methods=['POST', 'OPTIONS'])
 def admin_login():
     data = request.json
     admin_id = data.get("adminId")
