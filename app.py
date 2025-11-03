@@ -120,18 +120,23 @@ def teacher_login():
     if not teacher_id or not password:
         return jsonify({"success": False, "message": "Missing credentials"}), 400
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT name FROM teachers WHERE name = %s AND password = %s", (teacher_id, password))
-    user = cur.fetchone()
-    cur.close()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT name FROM teachers WHERE name = %s AND password = %s", (teacher_id, password))
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
 
-    if user:
-        token = generate_token("teacher", teacher_id)
-        return jsonify({"success": True, "message": "Login successful", "token": token})
+        if user:
+            token = generate_token("teacher", teacher_id)
+            return jsonify({"success": True, "message": "Login successful", "token": token})
 
-    return jsonify({"success": False, "message": "Invalid credentials"}), 401
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+    except Exception as e:
+        # Log the error for debugging on the server side
+        print(f"Teacher login database error: {e}")
+        return jsonify({"success": False, "message": "Internal server error"}), 500
 
 # ------------------------------ #
 # Admin Login                    #
@@ -145,19 +150,24 @@ def admin_login():
     if not admin_id or not password:
         return jsonify({"success": False, "message": "Missing credentials"}), 400
 
-    conn = get_db_connection()
-    cur = conn.cursor()
-    cur.execute("SELECT name FROM admins WHERE name = %s AND password = %s", (admin_id, password))
-    user = cur.fetchone()
-    cur.close()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("SELECT name FROM admins WHERE name = %s AND password = %s", (admin_id, password))
+        user = cur.fetchone()
+        cur.close()
+        conn.close()
 
-    if user:
-        user_type = "Paul" if admin_id == "Paul" and password == "1234" else "admin"
-        token = generate_token(user_type, admin_id)
-        return jsonify({"success": True, "message": "Login successful", "token": token})
+        if user:
+            user_type = "Paul" if admin_id == "Paul" and password == "1234" else "admin"
+            token = generate_token(user_type, admin_id)
+            return jsonify({"success": True, "message": "Login successful", "token": token})
 
-    return jsonify({"success": False, "message": "Invalid credentials"}), 401
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+    except Exception as e:
+        # Log the error for debugging on the server side
+        print(f"Admin login database error: {e}")
+        return jsonify({"success": False, "message": "Internal server error"}), 500
 
 # ------------------------------ #
 # Get Teachers                   #
