@@ -24,42 +24,49 @@ SCOPES = ['https://www.googleapis.com/auth/drive']
 SERVICE_ACCOUNT_FILE = os.getenv("GOOGLE_CREDENTIALS", "hostelmanagement-455018-5e40c6a6113c.json")
 UPLOAD_FOLDER_ID = os.getenv("UPLOAD_FOLDER_ID", "1-bPtMwp6rPE3D2yqmk5qnq8Ytvl_O07A")
 
-# Support loading Google service account credentials from an environment variable
-# (recommended for hosted environments like Render). If `GOOGLE_DRIVE_CREDENTIALS_JSON`
-# is set, it should contain the full JSON contents of the service account file.
-ga_json = os.getenv("GOOGLE_DRIVE_CREDENTIALS_JSON")
-if ga_json:
-    import json
-    ga_json_str = ga_json.strip()
-    # If the env var contains JSON text, parse it. If it contains a filename
-    # (for example someone placed the filename, possibly wrapped in braces
-    # like "{hostelmanagement-...json}"), load from that file. Otherwise
-    # raise a helpful error.
-    if ga_json_str.startswith("{") and '"' in ga_json_str:
-        # Likely actual JSON (contains double quotes)
-        try:
-            info = json.loads(ga_json_str)
-            creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
-        except Exception as e:
-            raise RuntimeError("Failed to parse GOOGLE_DRIVE_CREDENTIALS_JSON: {}".format(e))
-    else:
-        # Treat value as a filename (strip surrounding braces or quotes if present)
-        candidate = ga_json_str.strip().strip('{}').strip('"').strip("'")
-        if os.path.isfile(candidate):
-            creds = service_account.Credentials.from_service_account_file(candidate, scopes=SCOPES)
-        else:
-            raise RuntimeError(
-                "GOOGLE_DRIVE_CREDENTIALS_JSON is set but is not valid JSON nor a path to a file: '{}'".format(ga_json_str)
-            )
-else:
-    # Fall back to loading from a file path (useful for local development only)
-    creds_path = SERVICE_ACCOUNT_FILE
-    creds = service_account.Credentials.from_service_account_file(creds_path, scopes=SCOPES)
+creds = None
+drive_service = None
 
 try:
-    drive_service = build('drive', 'v3', credentials=creds)
+    # Support loading Google service account credentials from an environment variable
+    # (recommended for hosted environments like Render). If `GOOGLE_DRIVE_CREDENTIALS_JSON`
+    # is set, it should contain the full JSON contents of the service account file.
+    ga_json = os.getenv("GOOGLE_DRIVE_CREDENTIALS_JSON")
+    if ga_json:
+        import json
+        ga_json_str = ga_json.strip()
+        # If the env var contains JSON text, parse it. If it contains a filename
+        # (for example someone placed the filename, possibly wrapped in braces
+        # like "{hostelmanagement-...json}"), load from that file. Otherwise
+        # raise a helpful error.
+        if ga_json_str.startswith("{") and '"' in ga_json_str:
+            # Likely actual JSON (contains double quotes)
+            try:
+                info = json.loads(ga_json_str)
+                creds = service_account.Credentials.from_service_account_info(info, scopes=SCOPES)
+            except Exception as e:
+                raise RuntimeError("Failed to parse GOOGLE_DRIVE_CREDENTIALS_JSON: {}".format(e))
+        else:
+            # Treat value as a filename (strip surrounding braces or quotes if present)
+            candidate = ga_json_str.strip().strip('{}').strip('"').strip("'")
+            if os.path.isfile(candidate):
+                creds = service_account.Credentials.from_service_account_file(candidate, scopes=SCOPES)
+            else:
+                raise RuntimeError(
+                    "GOOGLE_DRIVE_CREDENTIALS_JSON is set but is not valid JSON nor a path to a file: '{}'".format(ga_json_str)
+                )
+    else:
+        # Fall back to loading from a file path (useful for local development only)
+        creds_path = SERVICE_ACCOUNT_FILE
+        creds = service_account.Credentials.from_service_account_file(creds_path, scopes=SCOPES)
+
+    if creds:
+        drive_service = build('drive', 'v3', credentials=creds)
+    else:
+        print("WARNING: Google Drive credentials could not be loaded.")
+
 except Exception as e:
-    print(f"WARNING: Failed to initialize Google Drive service: {e}")
+    print(f"WARNING: Failed to initialize Google Drive service due to credential error: {e}")
     drive_service = None
 
 # ------------------------------ #
