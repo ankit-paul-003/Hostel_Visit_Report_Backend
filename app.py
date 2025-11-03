@@ -79,14 +79,9 @@ SECRET_KEY = os.getenv('FLASK_SECRET_KEY')  # Use a strong key in production
 def get_db_connection():
     conn_str = os.getenv("DATABASE_URL")
     if not conn_str:
-        # Fallback for local development if DATABASE_URL is not set
-        return psycopg2.connect(
-            database="hostel_report",
-            user="postgres",
-            password="ankit123",
-            host="localhost",
-            port="5432"
-        )
+        # If DATABASE_URL is not set, we cannot connect to the remote database.
+        # Raise an error to prevent connection attempts to localhost on a deployed environment.
+        raise RuntimeError("DATABASE_URL environment variable is not set.")
     return psycopg2.connect(conn_str)
 
 # ------------------------------ #
