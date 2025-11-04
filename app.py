@@ -114,6 +114,10 @@ def verify_token(token):
     except jwt.InvalidTokenError:
         return None
 
+# main route
+@app.route('/')
+def index():
+    return "Hostel Management Backend is running."
 # ------------------------------ #
 # Teacher Login                  #
 # ------------------------------ #
