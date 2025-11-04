@@ -89,8 +89,11 @@ def get_db_connection():
     conn_str = os.getenv("DATABASE_URL")
     if not conn_str:
         # If DATABASE_URL is not set, we cannot connect to the remote database.
-        # Raise an error to prevent connection attempts to localhost on a deployed environment.
+        print("ERROR: DATABASE_URL environment variable is not set.")
         raise RuntimeError("DATABASE_URL environment variable is not set.")
+    
+    # Note: We avoid printing the full connection string for security, but confirm its presence.
+    print("INFO: Attempting database connection using DATABASE_URL.")
     return psycopg2.connect(conn_str)
 
 # ------------------------------ #
