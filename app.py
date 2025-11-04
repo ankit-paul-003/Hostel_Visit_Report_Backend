@@ -81,7 +81,7 @@ origins = [
     "https://hostel-visit-report-frontend.vercel.app",
 ]
 
-CORS(app, supports_credentials=True, origins=origins)
+CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}})
 SECRET_KEY = os.getenv('FLASK_SECRET_KEY')  # Use a strong key in production
 
 # ------------------------------ #
