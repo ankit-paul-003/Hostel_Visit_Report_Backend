@@ -122,6 +122,10 @@ def index():
 # ------------------------------ #
 @app.route('/teacher-login', methods=['POST', 'OPTIONS'])
 def teacher_login():
+    if request.method == 'OPTIONS':
+        # Preflight request, Flask-CORS should handle this, but we ensure a 200 OK response if it reaches here
+        return jsonify({'message': 'Preflight success'}), 200
+    
     data = request.json
     teacher_id = data.get("teacherId")
     password = data.get("password")
@@ -152,6 +156,10 @@ def teacher_login():
 # ------------------------------ #
 @app.route('/admin-login', methods=['POST', 'OPTIONS'])
 def admin_login():
+    if request.method == 'OPTIONS':
+        # Preflight request, Flask-CORS should handle this, but we ensure a 200 OK response if it reaches here
+        return jsonify({'message': 'Preflight success'}), 200
+    
     data = request.json
     admin_id = data.get("adminId")
     password = data.get("password")
