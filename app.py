@@ -92,6 +92,10 @@ def get_db_connection():
         print("ERROR: DATABASE_URL environment variable is not set.")
         raise RuntimeError("DATABASE_URL environment variable is not set.")
     
+    # Fix for Render/psycopg2 compatibility: replace 'postgres://' with 'postgresql://'
+    if conn_str.startswith("postgres://"):
+        conn_str = conn_str.replace("postgres://", "postgresql://", 1)
+        
     # Note: We avoid printing the full connection string for security, but confirm its presence.
     print("INFO: Attempting database connection using DATABASE_URL.")
     return psycopg2.connect(conn_str)
