@@ -75,7 +75,11 @@ except Exception as e:
 app = Flask(__name__)
 # Configure CORS to allow requests from your frontend domains
 # Define allowed origins
-CORS(app, supports_credentials=True, origins='*')
+ALLOWED_ORIGINS = [
+    "https://hostel-visit-report-frontend.vercel.app",
+    "http://localhost:5173"
+]
+CORS(app, supports_credentials=True, origins=ALLOWED_ORIGINS)
 SECRET_KEY = os.getenv('FLASK_SECRET_KEY')  # Use a strong key in production
 
 # ------------------------------ #
