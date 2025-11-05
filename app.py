@@ -303,6 +303,8 @@ def add_teacher():
 # ------------------------------ #
 @app.route('/delete-teacher/<int:teacher_id>', methods=['DELETE', 'OPTIONS'])
 def delete_teacher(teacher_id):
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'Preflight success'}), 200
     conn = get_db_connection()
     cur = conn.cursor()
     try:
@@ -320,6 +322,8 @@ def delete_teacher(teacher_id):
 # ------------------------------ #
 @app.route('/delete-form/<int:form_id>', methods=['DELETE', 'OPTIONS'])
 def delete_form(form_id):
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'Preflight success'}), 200
     token = request.headers.get("Authorization")
     if not token:
         return jsonify({"success": False, "message": "Unauthorized - No token provided"}), 401
@@ -399,6 +403,8 @@ def add_admin():
 # ------------------------------ #
 @app.route('/delete-admin/<int:admin_id>', methods=['DELETE', 'OPTIONS'])
 def delete_admin(admin_id):
+    if request.method == 'OPTIONS':
+        return jsonify({'message': 'Preflight success'}), 200
     token = request.headers.get("Authorization")
     if not token:
         return jsonify({"success": False, "message": "Unauthorized"}), 401
