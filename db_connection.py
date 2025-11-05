@@ -1,21 +1,24 @@
-<<<<<<< HEAD
-=======
+import os
 from dotenv import load_dotenv
-import os
-load_dotenv()
-
->>>>>>> 4efd6c871f2d2a90e6126f0e1cf9fc57364d4534
-import os
-
 from psycopg2.pool import SimpleConnectionPool
 
-<<<<<<< HEAD
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:ankit123@localhost:5432/hostel_report")
-=======
-DATABASE_URL = os.getenv("DATABASE_URL", "os.getenv('DATABASE_URL')")
->>>>>>> 4efd6c871f2d2a90e6126f0e1cf9fc57364d4534
+load_dotenv()
+
+# Use DATABASE_URL from environment
+DATABASE_URL = os.getenv("DATABASE_URL")
+
+if not DATABASE_URL:
+    # Fallback for local development if .env is not loaded or missing
+    print("WARNING: DATABASE_URL environment variable is not set. Using default for local development.")
+    # Assuming the local default from the .env file is the intended local connection string
+    DATABASE_URL = "postgresql://postgres:ankit123@localhost:5432/hostel_report"
+
+# Fix for Render/psycopg2 compatibility: replace 'postgres://' with 'postgresql://'
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 # Create pool sizes as needed
+# Note: If this file is not imported, this pool is unused.
 db_pool = SimpleConnectionPool(1, 10, DATABASE_URL)
 
 def get_db_connection():
