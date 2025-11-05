@@ -7,6 +7,8 @@ def get_db_connection():
     if not conn_str:
         raise RuntimeError("DATABASE_URL environment variable is not set.")
     
+    conn_str = conn_str.strip() # Strip whitespace, which caused the "hostel_report " error
+    
     # Fix for Render/psycopg2 compatibility
     if conn_str.startswith("postgres://"):
         conn_str = conn_str.replace("postgres://", "postgresql://", 1)
