@@ -1,5 +1,4 @@
 import os
-
 import datetime
 import os
 from io import BytesIO
@@ -8,6 +7,7 @@ import jwt
 import pandas as pd
 import psycopg2
 from flask import Flask, Response, jsonify, request
+from urllib.parse import urlparse
 from flask_cors import CORS
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -94,7 +94,8 @@ def get_db_connection():
         conn_str = conn_str.replace("postgres://", "postgresql://", 1)
         
     # Note: We avoid printing the full connection string for security, but confirm its presence.
-    print("INFO: Attempting database connection using DATABASE_URL.")
+    parsed_url = urlparse(conn_str)
+    print(f"INFO: Attempting database connection to host: {parsed_url.hostname} on port: {parsed_url.port}")
     return psycopg2.connect(conn_str)
 
 # ------------------------------ #
