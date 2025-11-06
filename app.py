@@ -458,6 +458,12 @@ def download_report(period):
         return jsonify({"error": "No data available"}), 404
 
     df = pd.DataFrame(rows, columns=column_names)
+    
+    # Fix: Convert timezone-aware datetimes to timezone-unaware for Excel compatibility
+    if 'created_at' in df.columns:
+        # Convert to timezone unaware
+        df['created_at'] = df['created_at'].apply(lambda x: x.replace(tzinfo=None) if x is not None and pd.notna(x) and hasattr(x, 'tzinfo') else x)
+        
     output = BytesIO()
     df.to_excel(output, index=False, engine='openpyxl')
     output.seek(0)
